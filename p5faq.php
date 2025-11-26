@@ -21,7 +21,15 @@ define('P5FAQ_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('P5FAQ_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 /**
- * Registrar Custom Post Type FAQ
+ * Load plugin textdomain for translations
+ */
+function p5faq_load_textdomain() {
+    load_plugin_textdomain('p5faq', false, dirname(plugin_basename(__FILE__)) . '/languages/');
+}
+add_action('init', 'p5faq_load_textdomain');
+
+/**
+ * Register Custom Post Type: FAQ
  */
 function p5faq_register_post_type() {
     $labels = array(
@@ -47,7 +55,7 @@ function p5faq_register_post_type() {
 
     $args = array(
         'label'                 => __('FAQ', 'p5faq'),
-        'description'           => __('Preguntas Frecuentes', 'p5faq'),
+        'description'           => __('Frequently Asked Questions', 'p5faq'),
         'labels'                => $labels,
         'supports'              => array('title'),
         'hierarchical'          => false,
@@ -71,12 +79,12 @@ function p5faq_register_post_type() {
 add_action('init', 'p5faq_register_post_type', 0);
 
 /**
- * Agregar Meta Box para preguntas y respuestas
+ * Add Meta Box for Questions & Answers
  */
 function p5faq_add_meta_boxes() {
     add_meta_box(
         'p5faq_questions',
-        __('Preguntas y Respuestas', 'p5faq'),
+        __('Questions & Answers', 'p5faq'),
         'p5faq_meta_box_callback',
         'faq',
         'normal',
@@ -86,7 +94,7 @@ function p5faq_add_meta_boxes() {
 add_action('add_meta_boxes', 'p5faq_add_meta_boxes');
 
 /**
- * Renderizar Meta Box
+ * Render Meta Box
  */
 function p5faq_meta_box_callback($post) {
     wp_nonce_field('p5faq_save_meta_box', 'p5faq_nonce');
@@ -107,7 +115,7 @@ function p5faq_meta_box_callback($post) {
             ?>
         </div>
         <button type="button" class="button button-primary" id="p5faq-add-item">
-            <?php _e('Agregar Pregunta', 'p5faq'); ?>
+            <?php _e('Add Question', 'p5faq'); ?>
         </button>
     </div>
     
@@ -160,7 +168,7 @@ function p5faq_meta_box_callback($post) {
 }
 
 /**
- * Renderizar un item individual de FAQ
+ * Render a single FAQ item
  */
 function p5faq_render_item($index, $item) {
     $question = isset($item['question']) ? esc_attr($item['question']) : '';
@@ -168,52 +176,52 @@ function p5faq_render_item($index, $item) {
     ?>
     <div class="p5faq-item" data-index="<?php echo $index; ?>">
         <div class="p5faq-item-header">
-            <h4><?php printf(__('Pregunta #%s', 'p5faq'), '<span class="p5faq-number">' . ($index + 1) . '</span>'); ?></h4>
+            <h4><?php printf(__('Question #%s', 'p5faq'), '<span class="p5faq-number">' . ($index + 1) . '</span>'); ?></h4>
             <a href="#" class="p5faq-remove" data-index="<?php echo $index; ?>">
-                <span class="dashicons dashicons-trash"></span> <?php _e('Eliminar', 'p5faq'); ?>
+                <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'p5faq'); ?>
             </a>
         </div>
         
         <div class="p5faq-field">
-            <label><?php _e('Pregunta:', 'p5faq'); ?></label>
+            <label><?php _e('Question:', 'p5faq'); ?></label>
             <input type="text" 
                    name="p5faq_items[<?php echo $index; ?>][question]" 
                    value="<?php echo $question; ?>" 
-                   placeholder="<?php _e('Escribe la pregunta aquí', 'p5faq'); ?>">
+                   placeholder="<?php _e('Write the question here', 'p5faq'); ?>">
         </div>
         
         <div class="p5faq-field">
-            <label><?php _e('Respuesta:', 'p5faq'); ?></label>
+            <label><?php _e('Answer:', 'p5faq'); ?></label>
             <textarea name="p5faq_items[<?php echo $index; ?>][answer]" 
-                      placeholder="<?php _e('Escribe la respuesta aquí', 'p5faq'); ?>"><?php echo $answer; ?></textarea>
+                      placeholder="<?php _e('Write the answer here', 'p5faq'); ?>"><?php echo $answer; ?></textarea>
         </div>
     </div>
     <?php
 }
 
 /**
- * Guardar Meta Box
+ * Save Meta Box
  */
 function p5faq_save_meta_box($post_id) {
     // Verificar nonce
     if (!isset($_POST['p5faq_nonce']) || !wp_verify_nonce($_POST['p5faq_nonce'], 'p5faq_save_meta_box')) {
         return;
-    }
+    // Verify nonce
 
     // Verificar autosave
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
         return;
-    }
+    // Check autosave
 
     // Verificar permisos
     if (!current_user_can('edit_post', $post_id)) {
         return;
-    }
+    // Check permissions
 
     // Guardar datos
     if (isset($_POST['p5faq_items'])) {
         $faq_items = array();
-        foreach ($_POST['p5faq_items'] as $item) {
+    // Save data
             if (!empty($item['question']) || !empty($item['answer'])) {
                 $faq_items[] = array(
                     'question' => sanitize_text_field($item['question']),
@@ -229,22 +237,20 @@ function p5faq_save_meta_box($post_id) {
 add_action('save_post_faq', 'p5faq_save_meta_box');
 
 /**
- * Enqueue scripts en admin
+ * Enqueue admin scripts
  */
 function p5faq_admin_scripts($hook) {
     global $post_type;
-    
-    if (('post.php' === $hook || 'post-new.php' === $hook) && 'faq' === $post_type) {
+    if (("post.php" === $hook || "post-new.php" === $hook) && 'faq' === $post_type) {
         wp_enqueue_script('p5faq-admin', P5FAQ_PLUGIN_URL . 'assets/admin.js', array('jquery'), P5FAQ_VERSION, true);
     }
 }
 add_action('admin_enqueue_scripts', 'p5faq_admin_scripts');
 
 /**
- * Registrar shortcode [faq id="123"]
+ * Register shortcode [faq id="123"]
  */
-// Almacén global para esquemas acumulados y evitar duplicados
-global $p5faq_schemas;
+// Global store to accumulate schemas and avoid duplicates
 $p5faq_schemas = array();
 
 function p5faq_shortcode($atts) {
@@ -257,13 +263,13 @@ function p5faq_shortcode($atts) {
     $post_id = intval($atts['id']);
     
     if (!$post_id || get_post_type($post_id) !== 'faq') {
-        return '<p>' . __('FAQ no encontrado.', 'p5faq') . '</p>';
+        return '<p>' . __('FAQ not found.', 'p5faq') . '</p>';
     }
 
     $faq_items = get_post_meta($post_id, '_p5faq_items', true);
     
     if (empty($faq_items) || !is_array($faq_items)) {
-        return '<p>' . __('No hay preguntas disponibles.', 'p5faq') . '</p>';
+        return '<p>' . __('No questions available.', 'p5faq') . '</p>';
     }
 
     $output = '<div class="p5faq-wrapper" data-faq-id="' . $post_id . '">';
