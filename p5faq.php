@@ -103,7 +103,11 @@ function p5faq_meta_box_callback($post) {
     if (!is_array($faq_items)) {
         $faq_items = array();
     }
+    
+    // Debug info
+    $script_url = P5FAQ_PLUGIN_URL . 'assets/admin.js';
     ?>
+    <!-- DEBUG: Script URL = <?php echo esc_html($script_url); ?> -->
     <div id="p5faq-container">
         <div id="p5faq-items">
             <?php
@@ -245,14 +249,20 @@ add_action('save_post_faq', 'p5faq_save_meta_box');
 function p5faq_admin_scripts($hook) {
     global $post_type;
     
+    // Debug: log the hook and post type
+    error_log('P5FAQ Debug - Hook: ' . $hook . ', Post Type: ' . $post_type);
+    
     // Only load on FAQ post edit screens
     if (('post.php' === $hook || 'post-new.php' === $hook) && 'faq' === $post_type) {
         // Enqueue dashicons for the trash icon
         wp_enqueue_style('dashicons');
         
+        $script_url = P5FAQ_PLUGIN_URL . 'assets/admin.js';
+        error_log('P5FAQ Debug - Enqueuing script: ' . $script_url);
+        
         wp_enqueue_script(
             'p5faq-admin', 
-            P5FAQ_PLUGIN_URL . 'assets/admin.js', 
+            $script_url, 
             array('jquery'), 
             P5FAQ_VERSION, 
             true
