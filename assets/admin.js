@@ -18,7 +18,7 @@ jQuery(document).ready(function($) {
     $(document).on('click', '.p5faq-remove', function(e) {
         e.preventDefault();
         
-        if (confirm('¿Estás seguro de que deseas eliminar esta pregunta?')) {
+        if (confirm('Are you sure you want to remove this question?')) {
             $(this).closest('.p5faq-item').remove();
             updateItemNumbers();
         }

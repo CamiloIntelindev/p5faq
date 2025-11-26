@@ -111,6 +111,9 @@ function p5faq_meta_box_callback($post) {
                 foreach ($faq_items as $index => $item) {
                     p5faq_render_item($index, $item);
                 }
+            } else {
+                // Render one empty item by default
+                p5faq_render_item(0, array('question' => '', 'answer' => ''));
             }
             ?>
         </div>
