@@ -203,25 +203,25 @@ function p5faq_render_item($index, $item) {
  * Save Meta Box
  */
 function p5faq_save_meta_box($post_id) {
-    // Verificar nonce
+    // Verify nonce
     if (!isset($_POST['p5faq_nonce']) || !wp_verify_nonce($_POST['p5faq_nonce'], 'p5faq_save_meta_box')) {
         return;
-    // Verify nonce
+    }
 
-    // Verificar autosave
+    // Check autosave
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
         return;
-    // Check autosave
+    }
 
-    // Verificar permisos
+    // Check permissions
     if (!current_user_can('edit_post', $post_id)) {
         return;
-    // Check permissions
+    }
 
-    // Guardar datos
+    // Save data
     if (isset($_POST['p5faq_items'])) {
         $faq_items = array();
-    // Save data
+        foreach ($_POST['p5faq_items'] as $item) {
             if (!empty($item['question']) || !empty($item['answer'])) {
                 $faq_items[] = array(
                     'question' => sanitize_text_field($item['question']),
