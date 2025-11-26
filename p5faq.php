@@ -247,13 +247,16 @@ add_action('save_post_faq', 'p5faq_save_meta_box');
  * Enqueue admin scripts
  */
 function p5faq_admin_scripts($hook) {
-    global $post_type;
+    // Get current screen
+    $screen = get_current_screen();
     
-    // Debug: log the hook and post type
-    error_log('P5FAQ Debug - Hook: ' . $hook . ', Post Type: ' . $post_type);
+    // Debug: log the hook and screen
+    if ($screen) {
+        error_log('P5FAQ Debug - Hook: ' . $hook . ', Screen ID: ' . $screen->id . ', Post Type: ' . $screen->post_type);
+    }
     
     // Only load on FAQ post edit screens
-    if (('post.php' === $hook || 'post-new.php' === $hook) && 'faq' === $post_type) {
+    if (('post.php' === $hook || 'post-new.php' === $hook) && $screen && 'faq' === $screen->post_type) {
         // Enqueue dashicons for the trash icon
         wp_enqueue_style('dashicons');
         
