@@ -1,0 +1,111 @@
+/* P5 FAQ - Frontend Styles */
+
+.p5faq-wrapper {
+    margin: 20px 0;
+}
+
+.p5faq-list {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.p5faq-item {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.p5faq-item:last-child {
+    border-bottom: none;
+}
+
+.p5faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    cursor: pointer;
+    background: #fff;
+    transition: background-color 0.3s ease;
+}
+
+.p5faq-question:hover {
+    background: #f9f9f9;
+}
+
+.p5faq-question-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    flex: 1;
+    padding-right: 15px;
+}
+
+.p5faq-toggle {
+    font-size: 24px;
+    font-weight: bold;
+    color: #666;
+    min-width: 30px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.p5faq-item.active .p5faq-toggle {
+    transform: rotate(45deg);
+}
+
+.p5faq-answer {
+    padding: 0 20px;
+    background: #fafafa;
+    overflow: hidden;
+}
+
+.p5faq-answer p {
+    margin: 0;
+    padding: 15px 0;
+    color: #666;
+    line-height: 1.6;
+}
+
+.p5faq-answer p:first-child {
+    padding-top: 5px;
+}
+
+.p5faq-answer p:last-child {
+    padding-bottom: 20px;
+}
+
+/* Animación suave para mostrar/ocultar */
+.p5faq-answer.show {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 500px;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .p5faq-question {
+        padding: 15px;
+    }
+    
+    .p5faq-question-title {
+        font-size: 16px;
+    }
+    
+    .p5faq-toggle {
+        font-size: 20px;
+    }
+    
+    .p5faq-answer {
+        padding: 0 15px;
+    }
+}
