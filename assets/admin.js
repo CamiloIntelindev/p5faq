@@ -1,11 +1,16 @@
 jQuery(document).ready(function($) {
+    console.log('P5 FAQ Admin Script Loaded');
+    
     var itemIndex = $('#p5faq-items .p5faq-item').length;
+    console.log('Initial item count:', itemIndex);
 
     // Add new question
     $('#p5faq-add-item').on('click', function(e) {
         e.preventDefault();
+        console.log('Add button clicked');
         
         var template = $('#p5faq-item-template').html();
+        console.log('Template:', template);
         var newItem = template.replace(/\{\{INDEX\}\}/g, itemIndex);
         
         $('#p5faq-items').append(newItem);

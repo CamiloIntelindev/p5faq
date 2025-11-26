@@ -244,8 +244,19 @@ add_action('save_post_faq', 'p5faq_save_meta_box');
  */
 function p5faq_admin_scripts($hook) {
     global $post_type;
-    if (("post.php" === $hook || "post-new.php" === $hook) && 'faq' === $post_type) {
-        wp_enqueue_script('p5faq-admin', P5FAQ_PLUGIN_URL . 'assets/admin.js', array('jquery'), P5FAQ_VERSION, true);
+    
+    // Only load on FAQ post edit screens
+    if (('post.php' === $hook || 'post-new.php' === $hook) && 'faq' === $post_type) {
+        // Enqueue dashicons for the trash icon
+        wp_enqueue_style('dashicons');
+        
+        wp_enqueue_script(
+            'p5faq-admin', 
+            P5FAQ_PLUGIN_URL . 'assets/admin.js', 
+            array('jquery'), 
+            P5FAQ_VERSION, 
+            true
+        );
     }
 }
 add_action('admin_enqueue_scripts', 'p5faq_admin_scripts');
