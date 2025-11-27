@@ -1,52 +1,58 @@
 jQuery(document).ready(function($) {
     console.log('P5 FAQ Admin Script Loaded');
-    
-    var itemIndex = $('#p5faq-items .p5faq-item').length;
-    console.log('Initial item count:', itemIndex);
 
-    // Add new question
+    // Add new FAQ item
     $('#p5faq-add-item').on('click', function(e) {
         e.preventDefault();
         console.log('Add button clicked');
         
-        var template = $('#p5faq-item-template').html();
-        console.log('Template:', template);
-        var newItem = template.replace(/\{\{INDEX\}\}/g, itemIndex);
+        // Find the highest index from existing items
+        var maxIndex = -1;
+        $('.p5faq-item .question').each(function() {
+            var currentIndex = parseInt($(this).attr('question-index-id')) || 0;
+            if (currentIndex > maxIndex) {
+                maxIndex = currentIndex;
+            }
+        });
         
-        $('#p5faq-items').append(newItem);
-        itemIndex++;
+        // New index is maxIndex + 1
+        var newIndex = maxIndex + 1;
+        console.log('Creating new item with index:', newIndex);
         
-        reindexItems();
+        // Clone the first item
+        var $newItem = $('.p5faq-item').first().clone();
+        
+        // Update the question input attributes
+        $newItem.find('.question')
+            .attr('question-index-id', newIndex)
+            .attr('name', 'p5faq_items[' + newIndex + '][question]')
+            .val(''); // Clear value
+        
+        // Update the answer input attributes
+        $newItem.find('.answer')
+            .attr('answer-index-id', newIndex)
+            .attr('name', 'p5faq_items[' + newIndex + '][answer]')
+            .val(''); // Clear value
+        
+        // Insert before the "Add Question" button
+        $newItem.insertBefore('#p5faq-add-item');
+        
+        console.log('New item added with index:', newIndex);
     });
 
-    // Remove question
-    $(document).on('click', '.p5faq-remove', function(e) {
+    // Remove FAQ item
+    $(document).on('click', '.remove-faq-item', function(e) {
         e.preventDefault();
+        
+        // Don't remove if it's the only item
+        if ($('.p5faq-item').length === 1) {
+            alert('You must have at least one FAQ item.');
+            return;
+        }
         
         if (confirm('Are you sure you want to remove this question?')) {
             $(this).closest('.p5faq-item').remove();
-            reindexItems();
+            console.log('Item removed');
         }
     });
-
-    // Reindex all items to maintain sequential order
-    function reindexItems() {
-        $('#p5faq-items .p5faq-item').each(function(index) {
-            // Update display number
-            $(this).find('.p5faq-number').text(index + 1);
-            
-            // Update data-index attribute
-            $(this).attr('data-index', index);
-            
-            // Update input field names to maintain order
-            $(this).find('input[type="text"]').attr('name', 'p5faq_items[' + index + '][question]');
-            $(this).find('textarea').attr('name', 'p5faq_items[' + index + '][answer]');
-            
-            // Update remove button data-index
-            $(this).find('.p5faq-remove').attr('data-index', index);
-        });
-        
-        // Update itemIndex for next additions
-        itemIndex = $('#p5faq-items .p5faq-item').length;
-    }
 });

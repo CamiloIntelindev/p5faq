@@ -22,6 +22,7 @@ define('P5FAQ_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('P5FAQ_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('P5FAQ_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
+
 /**
  * Load plugin textdomain for translations
  */
@@ -54,6 +55,7 @@ register_deactivation_hook(__FILE__, 'deactivate_p5faq');
 require_once P5FAQ_PLUGIN_DIR . 'includes/class-p5faq-post-type.php';
 require_once P5FAQ_PLUGIN_DIR . 'admin/class-p5faq-admin.php';
 require_once P5FAQ_PLUGIN_DIR . 'public/class-p5faq-public.php';
+
 
 /**
  * Initialize the plugin

@@ -31,26 +31,35 @@ class P5FAQ_Public {
         $this->version = $version;
 
         add_shortcode('faq', array($this, 'shortcode'));
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
+        add_action('init', array($this, 'enqueue_scripts'));
     }
 
     /**
      * Enqueue frontend scripts and styles
      */
     public function enqueue_scripts() {
+
         wp_enqueue_style(
-            $this->plugin_name . '-public',
+            'style-public',
             plugin_dir_url(dirname(__FILE__)) . 'assets/style.css',
             array(),
             $this->version
         );
         
         wp_enqueue_script(
-            $this->plugin_name . '-public',
+            'script-public',
             plugin_dir_url(dirname(__FILE__)) . 'assets/script.js',
             array('jquery'),
             $this->version,
-            true
+            array('defer' => true)
+        );
+
+        wp_enqueue_script(
+            'script-admin',
+            plugin_dir_url(dirname(__FILE__)) . 'assets/admin.js',
+            array('jquery'),
+            $this->version,
+            array('defer' => true)
         );
     }
 

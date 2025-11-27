@@ -51,109 +51,55 @@ class P5FAQ_Admin {
         wp_nonce_field('p5faq_save_meta_box', 'p5faq_nonce');
         
         $faq_items = get_post_meta($post->ID, '_p5faq_items', true);
-        if (!is_array($faq_items)) {
-            $faq_items = array();
+        if (!is_array($faq_items) || empty($faq_items)) {
+            $faq_items = array(array('question' => '', 'answer' => ''));
         }
-        
-        // Debug info
-        $script_url = plugin_dir_url(dirname(__FILE__)) . 'assets/admin.js';
         ?>
-        <!-- DEBUG: Script URL = <?php echo esc_html($script_url); ?> -->
         <div id="p5faq-container">
-            <div id="p5faq-items">
-                <?php
-                if (!empty($faq_items)) {
-                    foreach ($faq_items as $index => $item) {
-                        $this->render_faq_item($index, $item);
-                    }
-                } else {
-                    // Render one empty item by default
-                    $this->render_faq_item(0, array('question' => '', 'answer' => ''));
-                }
-                ?>
+            <?php foreach ($faq_items as $index => $item): ?>
+            <div class="p5faq-item">
+                <input type="text" 
+                       question-index-id="<?php echo esc_attr($index); ?>" 
+                       name="p5faq_items[<?php echo esc_attr($index); ?>][question]"
+                       class="question full-width" 
+                       placeholder="<?php _e('Enter question here', 'p5faq'); ?>"
+                       value="<?php echo esc_attr($item['question']); ?>">
+                <input type="text" 
+                       answer-index-id="<?php echo esc_attr($index); ?>"
+                       name="p5faq_items[<?php echo esc_attr($index); ?>][answer]"
+                       class="answer full-width" 
+                       placeholder="<?php _e('Enter answer here', 'p5faq'); ?>"
+                       value="<?php echo esc_attr($item['answer']); ?>">
+                <input type="button" 
+                       class="remove-faq-item button button-secondary" 
+                       value="<?php _e('Remove', 'p5faq'); ?>">
             </div>
+            <?php endforeach; ?>
             <button type="button" class="button button-primary" id="p5faq-add-item">
                 <?php _e('Add Question', 'p5faq'); ?>
             </button>
         </div>
-        
-        <script type="text/template" id="p5faq-item-template">
-            <?php $this->render_faq_item('{{INDEX}}', array('question' => '', 'answer' => '')); ?>
-        </script>
-        
         <style>
-            .p5faq-item {
-                background: #f9f9f9;
-                border: 1px solid #ddd;
-                padding: 15px;
-                margin-bottom: 15px;
-                position: relative;
-            }
-            .p5faq-item-header {
+            .p5faq-item{
                 display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 10px;
+                flex-direction: column;
+                gap: 15px;
+                flex-wrap: wrap;
+                align-items: end;
+                padding: 20px;
+                border: solid 1px #d2c2c2;
+                border-radius: 10px;
+                margin-bottom: 20px;
             }
-            .p5faq-item-header h4 {
-                margin: 0;
-            }
-            .p5faq-remove {
-                color: #a00;
-                cursor: pointer;
-                text-decoration: none;
-            }
-            .p5faq-remove:hover {
-                color: #dc3232;
-            }
-            .p5faq-field {
-                margin-bottom: 10px;
-            }
-            .p5faq-field label {
-                display: block;
-                font-weight: bold;
-                margin-bottom: 5px;
-            }
-            .p5faq-field input,
-            .p5faq-field textarea {
+            .p5faq-item > input[type="text"] {
+                padding: 8px;
+                font-size: 14px;
                 width: 100%;
             }
-            .p5faq-field textarea {
-                min-height: 100px;
+            .p5faq-item > input[type="button"] {
+                width: fit-content;
             }
         </style>
-        <?php
-    }
-
-    /**
-     * Render a single FAQ item
-     */
-    private function render_faq_item($index, $item) {
-        $question = isset($item['question']) ? esc_attr($item['question']) : '';
-        $answer = isset($item['answer']) ? esc_textarea($item['answer']) : '';
-        ?>
-        <div class="p5faq-item" data-index="<?php echo $index; ?>">
-            <div class="p5faq-item-header">
-                <h4><?php printf(__('Question #%s', 'p5faq'), '<span class="p5faq-number">' . ($index + 1) . '</span>'); ?></h4>
-                <a href="#" class="p5faq-remove" data-index="<?php echo $index; ?>">
-                    <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'p5faq'); ?>
-                </a>
-            </div>
-            
-            <div class="p5faq-field">
-                <label><?php _e('Question:', 'p5faq'); ?></label>
-                <input type="text" 
-                       name="p5faq_items[<?php echo $index; ?>][question]" 
-                       value="<?php echo $question; ?>" 
-                       placeholder="<?php _e('Write the question here', 'p5faq'); ?>">
-            </div>
-            
-            <div class="p5faq-field">
-                <label><?php _e('Answer:', 'p5faq'); ?></label>
-                <textarea name="p5faq_items[<?php echo $index; ?>][answer]" 
-                          placeholder="<?php _e('Write the answer here', 'p5faq'); ?>"><?php echo $answer; ?></textarea>
-            </div>
-        </div>
         <?php
     }
 
@@ -193,33 +139,4 @@ class P5FAQ_Admin {
         }
     }
 
-    /**
-     * Enqueue admin scripts and styles
-     */
-    public function enqueue_scripts($hook) {
-        // Get current screen
-        $screen = get_current_screen();
-        
-        // Debug: log the hook and screen
-        if ($screen) {
-            error_log('P5FAQ Debug - Hook: ' . $hook . ', Screen ID: ' . $screen->id . ', Post Type: ' . $screen->post_type);
-        }
-        
-        // Only load on FAQ post edit screens
-        if (('post.php' === $hook || 'post-new.php' === $hook) && $screen && 'faq' === $screen->post_type) {
-            // Enqueue dashicons
-            wp_enqueue_style('dashicons');
-            
-            $script_url = plugin_dir_url(dirname(__FILE__)) . 'assets/admin.js';
-            error_log('P5FAQ Debug - Enqueuing script: ' . $script_url);
-            
-            wp_enqueue_script(
-                $this->plugin_name . '-admin',
-                $script_url,
-                array('jquery'),
-                $this->version,
-                true
-            );
-        }
-    }
 }
