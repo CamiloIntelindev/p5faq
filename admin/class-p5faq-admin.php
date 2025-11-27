@@ -76,7 +76,7 @@ class P5FAQ_Admin {
 
         add_action('manage_faq_posts_custom_column', function($column, $post_id) {
             if ($column === 'p5faq_shortcode') {
-                $shortcode = '[faq id="' . intval($post_id) . '"]';
+                $shortcode = '[faq id="' . intval($post_id) . '" schema="false" title="false"]';
                 echo '<code>' . esc_html($shortcode) . '</code>';
             }
         }, 10, 2);
