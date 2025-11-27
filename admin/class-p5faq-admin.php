@@ -28,6 +28,27 @@ class P5FAQ_Admin {
         add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
         add_action('save_post_faq', array($this, 'save_meta_box'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
+        // Register admin list table columns for CPT faq
+        add_action('admin_init', array($this, 'register_list_table_columns'));
+    }
+
+    /**
+     * Enqueue admin scripts
+     */
+    public function enqueue_scripts($hook) {
+        global $post;
+        
+        if ($hook === 'post-new.php' || $hook === 'post.php') {
+            if (isset($post) && 'faq' === $post->post_type) {
+                wp_enqueue_script(
+                    'p5faq-admin',
+                    plugin_dir_url(dirname(__FILE__)) . 'assets/admin.js',
+                    array('jquery'),
+                    $this->version,
+                    true
+                );
+            }
+        }
     }
 
     /**
@@ -42,6 +63,23 @@ class P5FAQ_Admin {
             'normal',
             'high'
         );
+    }
+
+    /**
+     * Add shortcode column to FAQ list table
+     */
+    public function register_list_table_columns() {
+        add_filter('manage_edit-faq_columns', function($columns) {
+            $columns['p5faq_shortcode'] = __('Shortcode', 'p5faq');
+            return $columns;
+        });
+
+        add_action('manage_faq_posts_custom_column', function($column, $post_id) {
+            if ($column === 'p5faq_shortcode') {
+                $shortcode = '[faq id="' . intval($post_id) . '"]';
+                echo '<code>' . esc_html($shortcode) . '</code>';
+            }
+        }, 10, 2);
     }
 
     /**
